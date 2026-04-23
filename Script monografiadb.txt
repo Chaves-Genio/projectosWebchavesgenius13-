@@ -1,0 +1,85 @@
+
+use monografiadb;
+create table estudante(
+	id int primary key auto_increment,
+    nome varchar(50) not null,
+    sexo enum('M','F'),
+    num_Proc int unique not null,
+    curso varchar(20) not null,
+    turma varchar(10),
+    telefone varchar(25)
+);
+create table orientador(
+	id int primary key auto_increment,
+    nome varchar(50) not null,
+    especialidade varchar(100),
+    telefone varchar(25),
+    email varchar(100)
+);
+create table tema(
+	id int primary key auto_increment,
+    titulo varchar(150) not null,
+    descricao text,
+    area varchar(100),
+    estado_Tema enum('Proposto','Aprovado','Rejeitado') default 'Proposto',
+    data_Proposta date 
+    
+);
+create table grupo(
+	id int primary key auto_increment,
+    nome varchar(20),
+    num_Proc_Est1 int unique references estudante(num_Proc),
+    num_Proc_Est2 int unique references estudante(num_Proc),
+    data_Criacao date,
+    estado enum('Ativo','Inativo') default 'Inativo'
+);
+create table monografia(
+	id int primary key auto_increment,
+    idTema int,
+    idOrientador int,
+    idGrupo int,
+    estado_Monog enum('Em andamento','Concluída','Cancelada') default 'Em andamento',
+    data_Inicio date,
+    data_conclusao date,
+    foreign key(idTema)references tema(id),
+    foreign key(idOrientador)references orientador(id),
+    foreign key(idGrupo)references grupo(id)
+);
+create table submissao(
+	id int primary key auto_increment,
+    id_Monog int,
+    descricao text,
+    data_Submissao date,
+    ficheiro longblob null,
+    estado_Sub enum('Pendente','Aceite','Rejeitada') default 'Pendente',
+    foreign key(id_Monog) references monografia(id)
+);
+create table defesa(
+	id int primary key auto_increment,
+    id_Monog int,
+    data_Defesa date,
+    local varchar(100),
+    estado_Defesa enum('Agendada','Realizada','Cancelada') default 'Agendada',
+    foreign key(id_Monog) references monografia(id)
+);
+create table avaliacao(
+	id int auto_increment primary key,
+    id_Defesa int,
+    nota_Final decimal(5,2),
+    parecer text,
+    foreign key(id_Defesa) references defesa(id)
+);
+create table perfil(
+	id int auto_increment primary key,
+    nome varchar(50)
+);
+create table usuario(
+	id int auto_increment primary key,
+    nome varchar(50),
+    numBi varchar(14) unique not null,
+    senha_hash varchar(300) not null,
+    status enum('Ativo','Inativo') default 'Ativo',
+    tipo varchar(50) not null
+
+    
+);
